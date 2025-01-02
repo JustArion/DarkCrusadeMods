@@ -13,8 +13,6 @@
 
         <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-
-        <NoWarn>CA2255</NoWarn> <!--  The 'ModuleInitializer' attribute is only intended to be used in application code or advanced source generator scenarios -->
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -23,7 +21,7 @@
     </PropertyGroup>
 
     <ItemGroup Label="DllMain Bootstrapper">
-        <NativeLibrary Include="../Shared/CLRBootstrap.obj"/>
+        <NativeLibrary Include="../../Shared/CLRBootstrap.obj"/>
         <LinkerArg Include="/LIBPATH:..\\Shared" />
     </ItemGroup>
 

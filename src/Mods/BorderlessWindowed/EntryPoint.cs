@@ -1,5 +1,6 @@
 ﻿namespace Dawn.DarkCrusade.Mods.BorderlessWindowed;
 
+using System.Diagnostics.CodeAnalysis;
 using AOT.CoreLib.X86;
 using AOT.CoreLib.X86.Config;
 using AOT.CoreLib.X86.Logging;
@@ -116,9 +117,10 @@ internal static class EntryPoint
             RestoreWindow(hwnd);
     }
 
+    [SuppressMessage("ReSharper", "RedundantOverflowCheckingContext")]
     private static void MakeWindowBorderless(HWND handle)
     {
-        var style = _originalWindowStyle & (nint)~(WS_CAPTION | WS_MAXIMIZEBOX | WS_SYSMENU | WS_THICKFRAME);
+        var style = unchecked(_originalWindowStyle & (nint)~(WS_CAPTION | WS_MAXIMIZEBOX | WS_SYSMENU | WS_THICKFRAME));
         SetWindowLong(handle, WindowLongFlags.GWL_STYLE, style);
 
         ShowWindow(handle, ShowWindowCommand.SW_MAXIMIZE);
