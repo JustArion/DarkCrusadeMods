@@ -1,4 +1,4 @@
-﻿namespace InteractLuaVM;
+﻿namespace Dawn.DarkCrusade.InteractLuaVM;
 
 internal static class Patterns
 {

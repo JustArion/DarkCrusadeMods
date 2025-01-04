@@ -59,7 +59,7 @@ public sealed class Dispatcher : IDisposable
 
         var currentPid = Environment.ProcessId;
         // We only want our own process' threads
-        var procThreads = hSnapshot.EnumThread32().Where(x => x.th32OwnerProcessID == currentPid);
+        var procThreads = EnumSnap(hSnapshot, Thread32First, Thread32Next).Where(x => x.th32OwnerProcessID == currentPid);
 
         var earliestCreationTime = new FILETIME { dwLowDateTime = int.MaxValue, dwHighDateTime = int.MaxValue };
         var mainThreadId = 0U;
@@ -117,5 +117,18 @@ public sealed class Dispatcher : IDisposable
     {
         _hook.Dispose();
         GC.SuppressFinalize(this);
+    }
+    
+    private delegate bool FirstNext<TStruct>(HSNAPSHOT h, ref TStruct str) where TStruct : struct;
+
+    // The original uses 
+    // var pe = ReflectionExtensions.GetStaticFieldValue<TStruct>("Default");
+    // Which is stripped out due to Trimming
+    private static IEnumerable<THREADENTRY32> EnumSnap(HSNAPSHOT handle, FirstNext<THREADENTRY32> first, FirstNext<THREADENTRY32> next)
+    {
+        var pe = THREADENTRY32.Default;
+        Win32Error.ThrowLastErrorIfFalse(first(handle, ref pe));
+        do { yield return pe; } while (next(handle, ref pe));
+        Win32Error.ThrowLastErrorUnless(Win32Error.ERROR_NO_MORE_FILES);
     }
 }

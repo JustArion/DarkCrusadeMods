@@ -14,10 +14,15 @@
     </PropertyGroup>
 
     <ItemGroup>
+<!--      <PackageReference Include="Lua.NET" Version="5.0.3" />-->
       <PackageReference Include="Serilog" Version="4.2.0" />
+
+        <PackageReference Label="Attributes for ClangSharp Bindings"
+                          Include="ParallelExtensionsCore" Version="2.1.0" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Dawn.AOT.CoreLib.X86\Dawn.AOT.CoreLib.X86.csproj" />
       <ProjectReference Include="..\ModdingTools\ModdingTools.csproj" />
     </ItemGroup>
 

@@ -2,10 +2,11 @@
 namespace Dawn.Serilog.CustomEnrichers;
 
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using global::Serilog.Core;
 using global::Serilog.Events;
 
-public class ClassNameEnricher : ILogEventEnricher
+public partial class ClassNameEnricher : ILogEventEnricher
 {
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
@@ -57,9 +58,20 @@ public class ClassNameEnricher : ILogEventEnricher
     {
         var last = type.Split('.').LastOrDefault();
 
-        return last?.Split('+').FirstOrDefault()?.Replace("`1", string.Empty).Replace('_', '-');
+        var str = last?.Split('+').FirstOrDefault()?.Replace("`1", string.Empty).Replace('_', '-');
+        
+        // Add a space before every capital letter except the first instance of a capital letter
+        // eg. "ConfigWatcher" becomes "Config Watcher" and NOT " Config Watcher"
+        if (str == null)
+            return null;
+        
+        var retVal = CapitalLetterReplacement().Replace(str, "$1 $2");
+
+        return retVal;
     }
 
     private const string BLUE_ANSI = "\e[38;2;59;120;255m";
 
+    [GeneratedRegex("([a-z])([A-Z])")]
+    private static partial Regex CapitalLetterReplacement();
 }

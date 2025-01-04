@@ -1,6 +1,7 @@
 ﻿namespace Dawn.DarkCrusade.Mods.BorderlessWindowed;
 
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using AOT.CoreLib.X86;
 using AOT.CoreLib.X86.Config;
 using AOT.CoreLib.X86.Logging;
@@ -90,6 +91,12 @@ internal static class EntryPoint
     private static void DllMain()
     {
         var hwnd = GetMainThreadHandle(_loaderInfo.MainThreadId);
+
+        var sb = new StringBuilder();
+        _ = GetClassName(hwnd, sb, 255);
+        if (sb.ToString() == "ConsoleWindowClass")
+            return;
+        
 
         if (hwnd.IsNull)
         {
