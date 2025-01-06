@@ -6,6 +6,7 @@ public static partial class GlobalLua
 
     [LibraryImport(DLL_NAME, EntryPoint = "?Initialize@GlobalLua@@SGXXZ")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    [Obsolete("This function should not be called, the game normally calls this function")]
     public static partial void Initialize();
     
     [LibraryImport(DLL_NAME, EntryPoint = "?GetState@GlobalLua@@SGPAVLuaConfig@@XZ")]
@@ -14,5 +15,6 @@ public static partial class GlobalLua
     
     [LibraryImport(DLL_NAME, EntryPoint = "?Shutdown@GlobalLua@@SGXXZ")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
+    [Obsolete("This function should not be called, the game normally calls this function")]
     public static partial void Shutdown();
 }
