@@ -1,4 +1,4 @@
-﻿namespace Dawn.AOTCoreLib.ASM.Hooking;
+﻿namespace Dawn.AOT.CoreLib.X86;
 
 using System.Runtime.CompilerServices;
 
