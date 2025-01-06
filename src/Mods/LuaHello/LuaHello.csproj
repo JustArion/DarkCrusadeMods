@@ -13,6 +13,7 @@
 
         <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <LangVersion>preview</LangVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -35,6 +36,13 @@
     <ItemGroup>
         <ProjectReference Include="..\..\CoreLib\Dawn.AOT.CoreLib.X86\Dawn.AOT.CoreLib.X86.csproj" />
         <ProjectReference Include="..\..\CoreLib\InteractLuaVM\InteractLuaVM.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="CountingExample.lua" />
+      <AdditionalFiles Include="CountingExample.lua">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AdditionalFiles>
     </ItemGroup>
 
 </Project>

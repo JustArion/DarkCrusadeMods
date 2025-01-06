@@ -1,38 +1,41 @@
-﻿namespace Dawn.DarkCrusade.Mods.BorderlessWindowed;
+﻿namespace Dawn.DarkCrusade.Mods.HelloLua;
 
 using System.Runtime.CompilerServices;
 using AOT.CoreLib.X86;
 using AOT.CoreLib.X86.Config;
 using AOT.CoreLib.X86.Logging;
 using AOT.CoreLib.X86.Threading;
-using Config;
 using global::Serilog;
 using InteractLuaVM;
 
-internal static unsafe class EntryPoint
+internal static class EntryPoint
 {
     internal static LoaderInformation _loaderInfo;
-    private static ModFolder<ModConfig> _modFolder = null!;
+    private static ModFolder _modFolder = null!;
     
     [UnmanagedCallersOnly(EntryPoint = nameof(Init))]
-    public static unsafe void Init(LoaderInformation* loaderInfo) // BootstrapInformation*
+    public static void Init(nint loaderInfo) // BootstrapInformation*
     {
-        _loaderInfo = *loaderInfo;
-        Task.Run(() =>
+        unsafe
+        {
+            _loaderInfo = Unsafe.AsRef<LoaderInformation>(loaderInfo.ToPointer());
+        }
+        Task.Run(async () =>
         {
             try
             {
-                ModLogging.Initialize(_loaderInfo.Module);
-                _modFolder = new(_loaderInfo.Module, ConfigSourceGenerator.Default.ModConfig);
+                var module = _loaderInfo.Module;
+                ModLogging.Initialize(module);
+                _modFolder = new(module);
                 
-                DllMain();
+                await DllMain();
             }
             catch (Exception e)
             {
                 try
                 {
                     Log.Fatal(e, "Fatal Error");
-                    Log.CloseAndFlush();
+                    await Log.CloseAndFlushAsync();
                 }
                 catch (Exception ex)
                 {
@@ -42,51 +45,53 @@ internal static unsafe class EntryPoint
         });
     }
 
-    private static void DllMain()
+    private static void ExecuteInlineLua()
     {
-        
-
-        Dispatcher.MainThread.Post(() =>
-        {
-            // var l = DarkCrusadeVM.GetState();
-
-            // Log.Debug("lua_State* - 0x{Handle:X}", l.Handle);
-
-            Log.Debug("Lua Version: {Version}", lua_version());
-
-            // Push a string onto the Lua stack
-            const string testValue = "Hello from C#!";
-            
-            GlobalLua.GetState().RunString($"print('{testValue}')", false);
-
-            var state = GlobalLua.GetState();
-            state.RegisterFunction(nameof(CallOut), CallOut);
-            Log.Debug("Registered CallOut function");
-
-            state.RunString("CallOut('Hello, Lua!')", false);
-
-            // hook print
-
-
-
-            // lua_register(l, nameof(CallOut), CallOut);
-            // Log.Debug("Registered CallOut function");
-            //
-            // const string code = "CallOut('Hello, Lua!')";
-            //
-            // if (lua_dostring(l, code) == 0)
-            //     return;
-            //
-            // var error = lua_tostring(l, -1);
-            // Log.Error("LuaVM Exception: {Error}", new string(error));
-            // lua_pop(l, 1);
-        });
+        Config.RunString("print('Hello, from C#!')");
     }
 
+    private static void RegisterCustomFunctionInVM()
+    {
+        Config.RegisterFunction(CallOut);
+
+        Config.RunString("CallOut('Hello, from custom function!')");
+    }
+
+    private static void RunFileExample()
+    {
+
+        const string FILE_NAME = "CountingExample.lua";
+        var path = _modFolder.GetFile(FILE_NAME);
+
+        if (path != null)
+            Config.RunFile(path);
+        else 
+            Log.Warning("Could not find file: '{FileName}' in path '{Path}'", FILE_NAME, path);
+    }
+    
     private static int CallOut(lua_State luaState)
     {
         var str = lua_tostring(luaState, 1);
-        Log.Debug("DarkCrusadeVM: {Str}", str);
+        Log.Debug("CustomFunction: {Str}", str);
+        
         return 0;
+    }
+
+    private static LuaConfig Config 
+        => field == default 
+            ? field = GlobalLua.GetState() 
+            : field;
+
+    private static async Task DllMain()
+    {
+        Log.Debug("Lua Version: {Version}", lua_version());
+        
+        
+        // If you want to run the following code on the main thread instead
+        // await Dispatcher.EnsureRunningOnMainThread();
+
+        ExecuteInlineLua();
+        RegisterCustomFunctionInVM();
+        RunFileExample();
     }
 }
