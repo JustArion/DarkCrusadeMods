@@ -23,7 +23,7 @@
     </PropertyGroup>
 
     <ItemGroup Label="DllMain Bootstrapper">
-        <NativeLibrary Include="../Shared/CLRBootstrap.obj"/>
+        <NativeLibrary Include="../../Shared/CLRBootstrap.obj"/>
         <LinkerArg Include="/LIBPATH:..\\Shared" />
     </ItemGroup>
 
@@ -31,6 +31,10 @@
         <!--        <PackageReference Include="Dawn.AOT.CLRBootstrap" Version="1.0.2" />-->
         <PackageReference Include="Vanara.PInvoke.Kernel32" Version="4.0.4" />
         <PackageReference Include="Vanara.PInvoke.User32" Version="4.0.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\CoreLib\Dawn.AOT.CoreLib.X86\Dawn.AOT.CoreLib.X86.csproj" />
     </ItemGroup>
 
 </Project>

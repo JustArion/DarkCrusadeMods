@@ -1,20 +1,12 @@
 ﻿namespace DummyDLL;
 
 using System.Diagnostics;
+using Dawn.AOT.CoreLib.X86;
 
 internal static class EntryPoint
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    public readonly struct BootstrapInformation
-    {
-        public readonly nint HINSTANCE;
-        public readonly uint MainThreadId;
-        public readonly int MainThreadPriority;
-    }
-    internal static BootstrapInformation _loaderInfo;
-    
     [UnmanagedCallersOnly(EntryPoint = nameof(Init))]
-    public static unsafe void Init(BootstrapInformation* loaderInfo) // BootstrapInformation*
+    public static unsafe void Init(LoaderInformation* loaderInfo) // BootstrapInformation*
     {
         Console.WriteLine("Dummy dll checking in!");
     }
