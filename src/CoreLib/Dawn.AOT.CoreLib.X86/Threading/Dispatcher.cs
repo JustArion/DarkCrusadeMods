@@ -6,6 +6,19 @@ using global::Serilog;
 
 public sealed class Dispatcher : IDisposable
 {
+    public static ThreadTransferAwaiter EnsureRunningOnMainThread() => new(MainThread);
+
+    public readonly struct ThreadTransferAwaiter(Dispatcher dispatcher) : INotifyCompletion
+    {
+        public ThreadTransferAwaiter GetAwaiter() => this;
+        
+        public bool IsCompleted => GetCurrentThreadId() == dispatcher._threadId;
+        
+        public void GetResult() { }
+        
+        public void OnCompleted(Action continuation) => dispatcher.Post(continuation);
+    }
+
     public static Dispatcher MainThread { get; } = new(GetMainThreadId());
     
     private readonly SafeHHOOK _hook;
