@@ -42,7 +42,7 @@ public static class ModLogging
                 .WriteTo.Console(outputTemplate: LOGGING_FORMAT, theme: BlizzardTheme.GetTheme, applyThemeToRedirectedOutput: true, standardErrorFromLevel: LogEventLevel.Error)
                 .WriteTo.File(logPath, 
                     outputTemplate: LOGGING_FORMAT, 
-                    restrictedToMinimumLevel: LogEventLevel.Debug, 
+                    restrictedToMinimumLevel: LogEventLevel.Verbose, 
                     flushToDiskInterval: TimeSpan.FromSeconds(1));
             
             #if RELEASE
