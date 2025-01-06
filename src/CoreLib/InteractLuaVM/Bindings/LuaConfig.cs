@@ -1,10 +1,16 @@
 ﻿namespace Dawn.DarkCrusade.InteractLuaVM;
 
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
+using AOT.CoreLib.X86;
+using global::Serilog;
 
-public partial struct LuaConfig
+public partial struct LuaConfig : IEquatable<LuaConfig>
 {
+    internal const string DLL_NAME = "LuaConfig";
+
+    [SuppressMessage("ReSharper", "UnassignedField.Global")] 
+    public required nint Handle;
+    
     [SuppressMessage("ReSharper", "UnassignedField.Global")]
     public ref struct LuaFunc
     {
@@ -26,14 +32,50 @@ public partial struct LuaConfig
             ? 0 
             : Marshal.GetFunctionPointerForDelegate(fn);
     }
-    internal const string DLL_NAME = "LuaConfig";
+
+    public bool RunFile(FileInfo file)
+    {
+        ArgumentNullException.ThrowIfNull(file);
         
-    [SuppressMessage("ReSharper", "UnassignedField.Global")] 
-    public required nint Handle;
+        if (!file.Exists) 
+            throw new FileNotFoundException(null, file.FullName);
+        
+        // In Lua forward slashes are escapes
+        // return RunString($"dofile('{file.FullName.Replace("/", "//")}')");
+
+        // var path = file.FullName.Replace("/", "//");
+        var path = file.FullName;
+        Log.Debug("Running File: {Path}", path);
+        
+        var retVal = Lua.lua_dofile(GetState(), path);
+
+        Log.Debug("Run File Result: {Val}", retVal);
+        return retVal == 0;
+    }
     
-    public bool RunString(string str, bool b) => RunString(Handle, str, b);
-    public lua_State GetState() => GetState(Handle);
-    
+    /// <param name="str">Code</param>
+    /// <param name="b">Unknown</param>
+    /// <returns>If it successfully executed</returns>
+    public bool RunString(string str, bool b = false) => RunString(Handle, str, b);
+
+    // struct lua_State* __fastcall LuaConfig::GetState(class LuaConfig& arg1)
+    // {
+    //     return *arg1;
+    // }
+
+    // Since this is just a dereference + a type cast, we can do it ourselves without needing to call the export
+    public unsafe lua_State GetState()
+    {
+        // This prevents an Access Violation exception crashing the application
+        if (MemoryToolbelt.CanReadMemoryAt(Handle))
+        {
+            var hLuaState = *(nuint*)Handle;
+            return new lua_State { Handle =  hLuaState };            
+        }
+
+        throw new NullReferenceException($"Can not read memory at address 0x{Handle:X}");
+    }
+
     public void SetNumber(string key, double value) => SetNumber(Handle, key, value);
     
     public void SetBoolean(string key, bool value) => SetBoolean(Handle, key, value);
@@ -79,21 +121,64 @@ public partial struct LuaConfig
     
     public void SetString(string key, string value) => SetString(Handle, key, value);
 
+    public void RegisterFunction(Lua.lua_CFunction fn) => RegisterFunction(fn.Method.Name, fn);
+
+    [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract")]
     public void RegisterFunction(string name, Lua.lua_CFunction fn)
     {
+        Lua.lua_CFunction? wrapper = null;
+        if (fn != null)
+        {
+            wrapper = state =>
+            {
+                try
+                {
+                    return fn(state);
+                }
+                catch (Exception e)
+                {
+                    Log.Error(e, "[{Name}] Caught exception within Lua-C Function", name);
+                    return 1;
+                }
+            };
+            // Since lua_CFunctions cannot be deregistered we just keep the wrapper alive forever
+            GC.KeepAlive(wrapper);
+        }
+
         RegisterCFunc(Handle, name, new _LuaFunc
         {
-            Function = HandleNullFor(fn)
+            Function = HandleNullFor(wrapper)
         });
-        // int __stdcall Function(lua_State)
-        // delegate* unmanaged[Stdcall]<lua_State, int> func;
     }
 
+    [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract")]
     public void RegisterFunction(string name, LuaFunc func)
     {
+        Lua.lua_CFunction? wrapper = null;
+        var fn = func.Function;
+        if (fn != null)
+        {
+            wrapper = state =>
+            {
+                try
+                {
+                    return fn(state);
+                }
+                catch (Exception e)
+                {
+                    Log.Error(e, "[{Name}] Caught exception within Lua-C Function", name);
+                    return 1;
+                }
+            };
+            // Since lua_CFunctions cannot be deregistered we just keep the wrapper alive forever
+            GC.KeepAlive(wrapper);
+        }
+        
+        Log.Verbose("Registering C-Function: {Name}", name);
+        
         RegisterCFunc(Handle, name, new _LuaFunc
         {
-            Function = HandleNullFor(func.Function),
+            Function = HandleNullFor(wrapper),
             UpvalueCount = func.UpvalueCount,
             LightUserData = func.LightUserData 
         });
@@ -130,9 +215,9 @@ public partial struct LuaConfig
     [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
     private static partial void SetBoolean(nint @this, string key, [MarshalAs(UnmanagedType.U1)] bool value);
         
-    [LibraryImport(DLL_NAME, EntryPoint = "?GetState@LuaConfig@@QAEPAUlua_State@@XZ")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-    private static partial lua_State GetState(nint config);
+    // [LibraryImport(DLL_NAME, EntryPoint = "?GetState@LuaConfig@@QAEPAUlua_State@@XZ")]
+    // [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+    // private static partial nint GetState(nint @this);
     
     // bool (__thiscall* const LuaConfig:LuaConfig::RunString(LuaConfig* this, char const*, bool)
     [LibraryImport(DLL_NAME, EntryPoint = "?RunString@LuaConfig@@QAE_NPBD_N@Z", StringMarshalling = StringMarshalling.Utf8)]
@@ -154,4 +239,14 @@ public partial struct LuaConfig
     [LibraryImport(DLL_NAME, EntryPoint = "?GetLC@LuaConfig@@SGPAV1@PAUlua_State@@@Z")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvStdcall)])]
     public static partial LuaConfig GetLC(lua_State state);
+
+    public bool Equals(LuaConfig other) => Handle == other.Handle;
+
+    public override bool Equals(object? obj) => obj is LuaConfig other && Equals(other);
+
+    public override int GetHashCode() => Handle.GetHashCode();
+
+    public static bool operator ==(LuaConfig left, LuaConfig right) => left.Equals(right);
+
+    public static bool operator !=(LuaConfig left, LuaConfig right) => !(left == right);
 }
