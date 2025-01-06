@@ -16,6 +16,13 @@ public class ModFolder
     }
     public DirectoryInfo ModDirectory { get; }
 
+    public FileInfo? GetFile(string fileName)
+    {
+        var retVal =  ModDirectory.GetFiles(fileName).FirstOrDefault();
+
+        // We try the parent if there's no files here
+        return retVal ?? ModDirectory.Parent!.GetFiles(fileName).FirstOrDefault();
+    }
 }
 public class ModFolder<TConfig> : ModFolder where TConfig : class, new()
 {
@@ -103,5 +110,10 @@ public class ModFolder<TConfig> : ModFolder where TConfig : class, new()
         config = new();
                 
         SafeConfigWriter.WriteTo(JsonSerializer.Serialize(config, sourceGenerator), configFile.FullName);
+    }
+
+    public FileInfo? GetFile(string fileName)
+    {
+        return ModDirectory.GetFiles(fileName).FirstOrDefault();
     }
 }
