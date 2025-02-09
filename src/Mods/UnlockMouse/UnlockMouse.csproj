@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0-windows</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <RootNamespace>Dawn.DarkCrusade.Mods.UnlockMouse</RootNamespace>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <CopyNupkgToOutputDirectory>true</CopyNupkgToOutputDirectory>
+
+        <PublishAot>true</PublishAot>
+
+        <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <DebugSymbols>false</DebugSymbols>
+        <DebugType>none</DebugType>
+    </PropertyGroup>
+
+    <ItemGroup Label="DllMain Bootstrapper">
+        <NativeLibrary Include="../../Shared/CLRBootstrap.obj"/>
+        <LinkerArg Include="/LIBPATH:..\\Shared" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!--        <PackageReference Include="Dawn.AOT.CLRBootstrap" Version="1.0.2" />-->
+        <PackageReference Include="Vanara.PInvoke.Kernel32" Version="4.0.4" />
+        <PackageReference Include="Vanara.PInvoke.User32" Version="4.0.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\CoreLib\Dawn.AOT.CoreLib.X86\Dawn.AOT.CoreLib.X86.csproj" />
+    </ItemGroup>
+
+</Project>
