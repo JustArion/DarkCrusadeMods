@@ -10,7 +10,7 @@ public record LoaderConfig
     /// <summary>
     /// A Console will be attached or created 
     /// </summary>
-    public bool UseConsole = true;
+    public bool UseConsole = false;
 
     public Dictionary<string, short> LoadOrder = new();
 }
