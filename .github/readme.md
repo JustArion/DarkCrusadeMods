@@ -1,3 +1,6 @@
+Mods currently work in `Dark Crusade` & `Soulstorm` currently
+- [Borderless Windowed](../src/Mods/BorderlessWindowed/)
+
 To Enable Default Lua Console:
 - `Right Ctrl` + `Right Shift` + `~` (Tilde)
 
