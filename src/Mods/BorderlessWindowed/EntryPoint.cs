@@ -14,9 +14,9 @@ internal static class EntryPoint
     private static ModFolder<ModConfig> _modFolder = null!;
     
     [UnmanagedCallersOnly(EntryPoint = nameof(Init))]
-    public static unsafe void Init(LoaderInformation* loaderInfo) // BootstrapInformation*
+    public static void Init(nint loaderInfo) // BootstrapInformation*
     {
-        _loaderInfo = *loaderInfo;
+        _loaderInfo = LoaderInformation.FromPointer(loaderInfo); 
         Task.Run(() =>
         {
             try
@@ -39,25 +39,6 @@ internal static class EntryPoint
                 }
             }
         });
-    }
-
-
-    private static uint GetMainThreadId()
-    {
-        uint mainThread = 0;
-        EnumWindows((hwnd, procId) =>
-        {
-            var tid = GetWindowThreadProcessId(hwnd, out var pid);
-            if (pid != procId)
-                return true;
-    
-            // The first thread id is always the oldest (aka the main thread)
-            mainThread = tid;
-            return false;
-    
-        }, Environment.ProcessId);
-    
-        return mainThread;
     }
 
     private static HWND GetMainThreadHandle(uint threadId = 0)
@@ -90,28 +71,43 @@ internal static class EntryPoint
     private static nint _originalWindowStyle;
     private static void DllMain()
     {
+        _modFolder.ConfigUpdated += OnConfigUpdated;
+
+        if (!_modFolder.Config.Enabled) 
+            return;
+        
         var hwnd = GetMainThreadHandle(_loaderInfo.MainThreadId);
+        _originalWindowStyle = GetWindowLongAuto(hwnd, WindowLongFlags.GWL_STYLE);
 
         var sb = new StringBuilder();
         _ = GetClassName(hwnd, sb, 255);
         if (sb.ToString() == "ConsoleWindowClass")
             return;
-        
 
-        if (hwnd.IsNull)
-        {
-            Log.Error("Failed to get main thread window");
+        if (!CanMakeWindowBorderless(hwnd))
             return;
-        }
-        
-        _originalWindowStyle = GetWindowLongAuto(hwnd, WindowLongFlags.GWL_STYLE);
 
-        _modFolder.ConfigUpdated += OnConfigUpdated;
-
-        if (!_modFolder.Config.Enabled) 
-            return;
         MakeWindowBorderless(hwnd);
-        Log.Information("The game is now borderless");
+    }
+
+    private static bool CanMakeWindowBorderless(HWND hwnd)
+    {
+        if (hwnd.IsNull)
+            return false;
+        
+        if (!File.Exists("Local.ini"))
+        {
+            Log.Error("Failed to find Local.ini, unable to detect if the game is in windowed mode");
+            return false;
+        }
+
+        var isWindowed = File.ReadAllLines("Local.ini").Contains("screenwindowed=1");
+
+        if (isWindowed) 
+            return true;
+        
+        Log.Error("The game is not in windowed mode");
+        return false;
     }
 
     private static void OnConfigUpdated()
@@ -131,6 +127,8 @@ internal static class EntryPoint
         SetWindowLong(handle, WindowLongFlags.GWL_STYLE, style);
 
         ShowWindow(handle, ShowWindowCommand.SW_MAXIMIZE);
+        
+        Log.Information("The game is now borderless");
     }
     
     private static void RestoreWindow(HWND handle)
