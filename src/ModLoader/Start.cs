@@ -75,10 +75,10 @@ internal static class Start
         if (_config.UseConsole && Logging.InitializeConsole())
             Console.WriteLine("[*] Attached to existing Console!");
         
-        Logging.SaveConsoleOutputTo(Heuristics.ModsFolder);
-        
         // We don't call Logging.Initialize before Logging.InitializeConsole as this can cause log artifacts in the console for AllocConsole users
         Logging.Initialize(Heuristics.CurrentModuleDirectory);
+        
+        Logging.SaveConsoleOutputTo(Heuristics.ModsFolder);
         Log.Verbose("Game Main Thread Id: 0x{MainThreadId:X}, Current Thread Id: 0x{CurrentThreadId:X}", EntryPoint.LoaderInfo.MainThreadId, GetCurrentThreadId());
     }
 
