@@ -12,8 +12,11 @@ public class ModFolder
         var fileInfo = new FileInfo(GetModuleFileName(hInstance));
         var fileName = Path.GetFileNameWithoutExtension(fileInfo.Name);
 
-        ModDirectory = fileInfo.Directory!.CreateSubdirectory(fileName);
+        ModsDirectory = fileInfo.Directory!;
+        ModDirectory = ModsDirectory.CreateSubdirectory(fileName);
     }
+    
+    public DirectoryInfo ModsDirectory { get; }
     public DirectoryInfo ModDirectory { get; }
 
     public FileInfo? GetFile(string fileName)
@@ -110,10 +113,5 @@ public class ModFolder<TConfig> : ModFolder where TConfig : class, new()
         config = new();
                 
         SafeConfigWriter.WriteTo(JsonSerializer.Serialize(config, sourceGenerator), configFile.FullName);
-    }
-
-    public FileInfo? GetFile(string fileName)
-    {
-        return ModDirectory.GetFiles(fileName).FirstOrDefault();
     }
 }
