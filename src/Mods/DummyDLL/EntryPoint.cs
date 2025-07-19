@@ -1,4 +1,6 @@
-﻿namespace DummyDLL;
+﻿using Dawn.AOT.CoreLib.X86.Loader;
+
+namespace DummyDLL;
 
 using System.Diagnostics;
 using Dawn.AOT.CoreLib.X86;

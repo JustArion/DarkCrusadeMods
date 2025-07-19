@@ -1,10 +1,9 @@
 ﻿#nullable enable
-namespace Dawn.Serilog.CustomEnrichers;
-
-using System.Diagnostics;
 using System.Text.RegularExpressions;
-using global::Serilog.Core;
-using global::Serilog.Events;
+using Serilog.Core;
+using Serilog.Events;
+
+namespace Dawn.AOT.CoreLib.X86.Logging.Serilog.Enrichers;
 
 public partial class ClassNameEnricher : ILogEventEnricher
 {

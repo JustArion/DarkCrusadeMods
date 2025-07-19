@@ -1,4 +1,4 @@
-﻿namespace Dawn.AOT.CoreLib.X86;
+﻿namespace Dawn.AOT.CoreLib.X86.Loader;
 
 [StructLayout(LayoutKind.Sequential)]
 public readonly struct LoaderInformation

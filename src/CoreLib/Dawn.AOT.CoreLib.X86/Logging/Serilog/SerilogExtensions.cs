@@ -1,7 +1,8 @@
-﻿namespace Dawn.Serilog.CustomEnrichers;
+﻿using Dawn.AOT.CoreLib.X86.Logging.Serilog.Enrichers;
+using Serilog;
+using Serilog.Configuration;
 
-using global::Serilog;
-using global::Serilog.Configuration;
+namespace Dawn.AOT.CoreLib.X86.Logging.Serilog;
 
 public static class SerilogExtensions
 {

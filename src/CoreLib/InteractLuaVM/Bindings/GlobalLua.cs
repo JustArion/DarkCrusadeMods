@@ -1,5 +1,10 @@
-﻿namespace Dawn.DarkCrusade.InteractLuaVM;
+﻿// ReSharper disable UnusedMember.Global
 
+using System.Diagnostics.CodeAnalysis;
+
+namespace Dawn.DarkCrusade.InteractLuaVM;
+
+[SuppressMessage("Interoperability", "CA1401:P/Invokes should not be visible")]
 public static partial class GlobalLua
 {
     internal const string DLL_NAME = "LuaConfig";

@@ -1,4 +1,6 @@
-﻿namespace Dawn.DarkCrusade.ModLoader;
+﻿using Dawn.AOT.CoreLib.X86.Loader;
+
+namespace Dawn.DarkCrusade.ModLoader;
 
 using System.Reflection;
 using AOT.CoreLib.X86;

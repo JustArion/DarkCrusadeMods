@@ -1,4 +1,6 @@
-﻿namespace Dawn.DarkCrusade.Mods.BorderlessWindowed;
+﻿using Dawn.AOT.CoreLib.X86.Loader;
+
+namespace Dawn.DarkCrusade.Mods.BorderlessWindowed;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Text;

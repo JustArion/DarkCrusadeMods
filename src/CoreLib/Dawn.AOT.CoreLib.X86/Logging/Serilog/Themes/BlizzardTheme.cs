@@ -1,8 +1,8 @@
-﻿namespace Dawn.Serilog.Themes;
+﻿using JetBrains.Annotations;
+using Serilog.Sinks.Console.LogThemes;
+using Serilog.Sinks.SystemConsole.Themes;
 
-using global::Serilog.Sinks.Console.LogThemes;
-using global::Serilog.Sinks.SystemConsole.Themes;
-using JetBrains.Annotations;
+namespace Dawn.AOT.CoreLib.X86.Logging.Serilog.Themes;
 
 [UsedImplicitly]
 public class BlizzardTheme : AnsiBaseTheme

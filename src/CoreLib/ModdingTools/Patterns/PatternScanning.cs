@@ -1,4 +1,6 @@
-﻿namespace Dawn.DarkCrusade.ModdingTools.Patterns;
+﻿using Dawn.DarkCrusade.ModdingTools.Memory;
+
+namespace Dawn.DarkCrusade.ModdingTools.Patterns;
 
 using Reloaded.Memory.Sigscan;
 using Reloaded.Memory.Sigscan.Definitions.Structs;

@@ -1,10 +1,11 @@
-﻿namespace Dawn.AOT.CoreLib.X86.Logging;
+﻿using Dawn.AOT.CoreLib.X86.Logging.Serilog;
+using Dawn.AOT.CoreLib.X86.Logging.Serilog.Themes;
+
+namespace Dawn.AOT.CoreLib.X86.Logging;
 
 using System.Diagnostics.CodeAnalysis;
 using global::Serilog;
 using global::Serilog.Events;
-using Serilog.CustomEnrichers;
-using Serilog.Themes;
 using Vanara.PInvoke;
 
 public static class ModLogging

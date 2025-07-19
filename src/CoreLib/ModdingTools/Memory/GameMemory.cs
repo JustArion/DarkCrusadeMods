@@ -1,6 +1,6 @@
-﻿namespace Dawn.DarkCrusade.ModdingTools;
+﻿using System.Diagnostics;
 
-using System.Diagnostics;
+namespace Dawn.DarkCrusade.ModdingTools.Memory;
 
 public unsafe ref struct GameMemory
 {
