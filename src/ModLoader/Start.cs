@@ -23,7 +23,7 @@ internal static class Start
 
         var mods = Heuristics.GetOrderedMods();
         LogLoadOrder();
-
+        
         Log.Verbose("Waiting on Load Delay");
         await Task.Delay(TimeSpan.FromSeconds(_config.LoadDelaySeconds));
         Log.Verbose("Delay Complete, Loading Mods");
@@ -75,11 +75,14 @@ internal static class Start
         if (_config.UseConsole && Logging.InitializeConsole())
             Console.WriteLine("[*] Attached to existing Console!");
         
+        Logging.SaveConsoleOutputTo(Heuristics.ModsFolder);
+        
         // We don't call Logging.Initialize before Logging.InitializeConsole as this can cause log artifacts in the console for AllocConsole users
         Logging.Initialize(Heuristics.CurrentModuleDirectory);
         Log.Verbose("Game Main Thread Id: 0x{MainThreadId:X}, Current Thread Id: 0x{CurrentThreadId:X}", EntryPoint.LoaderInfo.MainThreadId, GetCurrentThreadId());
     }
 
+    private static List<nint> _modHandles = [];
     private static async Task LoadMods(FileInfo[] mods)
     {
         try
@@ -97,8 +100,10 @@ internal static class Start
                     #endif
                     
                     var modHandle = NativeLibrary.Load(mod.FullName);
+                    _modHandles.Add(modHandle);
                     
                     Log.Debug("Loaded {ModName} at 0x{Address:X}", modName, modHandle);
+                    
                     await Task.Delay(TimeSpan.FromMilliseconds(25));
                 }
                 catch (Exception e)
