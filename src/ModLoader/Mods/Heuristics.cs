@@ -12,14 +12,14 @@ internal static class Heuristics
     public static DirectoryInfo CurrentModuleDirectory => _currentModule.Directory!;
 
     // private static DirectoryInfo ModFolder => Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "mods"));
-    public static DirectoryInfo ModFolder => Directory.CreateDirectory(Path.Combine(_currentModule.Directory!.FullName, "mods"));
+    public static DirectoryInfo ModsFolder => Directory.CreateDirectory(Path.Combine(_currentModule.Directory!.FullName, "mods"));
 
-    public static string ModFolderPath => ModFolder.FullName;
-    public static List<FileInfo> GetMods() => ModFolder.EnumerateFiles("*.dll", SearchOption.AllDirectories).ToList();
+    public static string ModFolderPath => ModsFolder.FullName;
+    public static List<FileInfo> GetMods() => ModsFolder.EnumerateFiles("*.dll", SearchOption.AllDirectories).ToList();
 
     public static FileInfo[] GetOrderedMods()
     {
-        Log.Verbose("Looking for mods in {ModFolder}", ModFolder.FullName);
+        Log.Verbose("Looking for mods in {ModFolder}", ModsFolder.FullName);
         var mods = GetMods();
         var modSHAs= new Dictionary<string, FileInfo>();
 
@@ -68,7 +68,7 @@ internal static class Heuristics
             var hash = sha256.ComputeHash(stream);
             var hashString = Convert.ToBase64String(hash);
 
-            var modDirectoryPath = ModFolder.FullName;
+            var modDirectoryPath = ModsFolder.FullName;
             
             if (modSHAs.Any(h => h.Key == hashString))
             {
