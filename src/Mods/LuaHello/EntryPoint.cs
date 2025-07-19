@@ -1,12 +1,12 @@
-﻿namespace Dawn.DarkCrusade.Mods.HelloLua;
+﻿using System.Runtime.CompilerServices;
+using Dawn.AOT.CoreLib.X86;
+using Dawn.AOT.CoreLib.X86.Config;
+using Dawn.AOT.CoreLib.X86.Loader;
+using Dawn.AOT.CoreLib.X86.Logging;
+using Dawn.DarkCrusade.InteractLuaVM;
+using Serilog;
 
-using System.Runtime.CompilerServices;
-using AOT.CoreLib.X86;
-using AOT.CoreLib.X86.Config;
-using AOT.CoreLib.X86.Logging;
-using AOT.CoreLib.X86.Threading;
-using global::Serilog;
-using InteractLuaVM;
+namespace Dawn.DarkCrusade.Mods.LuaHello;
 
 internal static class EntryPoint
 {
@@ -82,7 +82,7 @@ internal static class EntryPoint
             ? field = GlobalLua.GetState() 
             : field;
 
-    private static async Task DllMain()
+    private static Task DllMain()
     {
         Log.Debug("Lua Version: {Version}", lua_version());
         
@@ -93,5 +93,6 @@ internal static class EntryPoint
         ExecuteInlineLua();
         RegisterCustomFunctionInVM();
         RunFileExample();
+        return Task.CompletedTask;
     }
 }
