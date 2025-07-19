@@ -1,29 +1,13 @@
-#define ulong unsigned long
-#define EXPORT EXTERN_C __MIDL_DECLSPEC_DLLEXPORT
+﻿// ReSharper disable CppInconsistentNaming
 #include <exception>
 #include <iostream>
 #include <ostream>
 #include <string>
 #include <windows.h>
 #include <tlhelp32.h>
+#include "dllmain.h"
 
-typedef struct
-{
-    HINSTANCE Module;
-    DWORD MainThreadId;
-    int MainThreadPriority;
-} LOADER_INFORMATION, *PLOADER_INFORMATION;
-
-typedef void (*InitFunc)(PLOADER_INFORMATION);
-
-typedef struct
-{
-    InitFunc CLREntryPoint;
-    PLOADER_INFORMATION PLoaderInfo;
-} CLRInitFunc, *PCLRInitFunc;
-
-
-DWORD WINAPI DllThread(const PLOADER_INFORMATION lpParameter)
+static DWORD WINAPI DllThread(const PLOADER_INFORMATION lpParameter)
 {
     const auto loaderInfo = *lpParameter;
     // ReSharper disable once CppFunctionResultShouldBeUsed
@@ -51,7 +35,7 @@ DWORD WINAPI DllThread(const PLOADER_INFORMATION lpParameter)
     return 0;
 }
 
-DWORD GetMainThreadId()
+static DWORD GetMainThreadId()
 {
     const auto processId = GetCurrentProcessId();
     DWORD mainThreadId = 0;
@@ -92,7 +76,7 @@ DWORD GetMainThreadId()
     return mainThreadId;
 }
 
-EXPORT bool cdecl DllMain(const HMODULE hModule, const ulong fdwReason, LPVOID _) noexcept
+BOOL APIENTRY DllMain(const HMODULE hModule, const ulong fdwReason, LPVOID _) noexcept
 {
     if (fdwReason != DLL_PROCESS_ATTACH)
         return true;
