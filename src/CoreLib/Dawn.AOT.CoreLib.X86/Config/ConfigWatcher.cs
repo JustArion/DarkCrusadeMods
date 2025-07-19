@@ -20,7 +20,8 @@ public class ConfigWatcher(FileInfo file) : IDisposable
         };
         _watcher.EnableRaisingEvents = true;
         _watcher.Error += (_, args) => { Log.Error(args.GetException(), "File Watcher Error"); };
-        _logger.Information("WatchDog active on {FilePath}. Watching for config changes", file.Name);
+        var fileName = $"{file.Directory?.Name}{Path.DirectorySeparatorChar}{file.Name}";
+        _logger.Information("WatchDog active on {FilePath}. Watching for config changes", fileName);
     }
 
     public void Stop()
