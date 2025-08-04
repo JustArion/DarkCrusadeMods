@@ -1,13 +1,13 @@
-﻿namespace Dawn.DarkCrusade.Mods.UnlockMouse;
+﻿using Dawn.AOT.CoreLib.X86.Loader;
+using PlatformBindings;
 
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
-using AOT.CoreLib.X86;
+namespace Dawn.DarkCrusade.Mods.UnlockMouse;
+
 using AOT.CoreLib.X86.Config;
 using AOT.CoreLib.X86.Logging;
 using Config;
-using global::Serilog;
-using static WindowStyles;
+using Serilog;
+
 internal static class EntryPoint
 {
     internal static LoaderInformation _loaderInfo;
@@ -24,7 +24,7 @@ internal static class EntryPoint
                 ModLogging.Initialize(_loaderInfo.Module);
                 _modFolder = new(_loaderInfo.Module, ConfigSourceGenerator.Default.ModConfig);
                 
-                DllMain();
+                Task.Run(DllMain);
             }
             catch (Exception e)
             {
