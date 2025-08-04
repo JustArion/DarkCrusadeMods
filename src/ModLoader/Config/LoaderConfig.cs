@@ -12,5 +12,10 @@ public record LoaderConfig
     /// </summary>
     public bool UseConsole = false;
 
+    /// <summary>
+    /// Console.log will not be cleared on next start of the game
+    /// </summary>
+    public bool PreserveLogs = false;
+
     public Dictionary<string, short> LoadOrder = new();
 }
