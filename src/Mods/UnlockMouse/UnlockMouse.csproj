@@ -29,9 +29,11 @@
         <!--        <PackageReference Include="Dawn.AOT.CLRBootstrap" Version="1.0.2" />-->
         <PackageReference Include="Vanara.PInvoke.Kernel32" Version="4.0.4" />
         <PackageReference Include="Vanara.PInvoke.User32" Version="4.0.4" />
+        <PackageReference Include="Serilog" Version="4.3.0" />
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\PlatformBindings\PlatformBindings.csproj" />
         <ProjectReference Include="..\..\CoreLib\Dawn.AOT.CoreLib.X86\Dawn.AOT.CoreLib.X86.csproj" />
     </ItemGroup>
 
