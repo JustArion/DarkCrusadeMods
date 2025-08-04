@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0-windows</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Vanara.PInvoke.Kernel32" Version="4.0.4" />
+        <PackageReference Include="Vanara.PInvoke.User32" Version="4.0.4" />
+
+        <PackageReference Include="Serilog" Version="4.3.0" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="..\..\CoreLib\Dawn.AOT.CoreLib.X86\Dawn.AOT.CoreLib.X86.csproj"  />
+    </ItemGroup>
+</Project>
