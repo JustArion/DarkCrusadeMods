@@ -1,1 +1,1 @@
-dotnet publish -r win-x64 -c Release -o .\bin\
+dotnet publish -r win-x86 -c Release -o .\bin\
